@@ -136,7 +136,7 @@ const resolveNewSetting = state => (key, value) => {
 
 // Our sections
 // TODO: Translate
-const sections = [{
+const createSections = core => [{
   title: 'Background',
   items: [{
     label: 'Image',
@@ -207,7 +207,8 @@ const sections = [{
 }];
 
 // Renders sections
-const renderSections = (components, sections, state, actions) => {
+const renderSections = (core, components, state, actions) => {
+  const sections = createSections(core);
   const resolver = resolveSetting(state.settings, state.defaults);
   const setting = path => resolver(path);
   const {Section, Item} = components;
@@ -275,7 +276,7 @@ const renderWindow = (core, proc) => ($content, win) => {
       orientation: 'horizontal',
       style: {overflow: 'auto'}
     }, [
-      ...renderSections(components, sections, state, actions)
+      ...renderSections(core, components, state, actions)
     ]),
 
     h(BoxContainer, {}, [
@@ -289,7 +290,6 @@ const renderWindow = (core, proc) => ($content, win) => {
 
   const initialState = {
     loading: false,
-    toggles: sections.map(() => true),
     locales: getLocales(),
     themes: getThemes(),
     defaults: getDefaults(),
