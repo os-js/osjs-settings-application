@@ -63,11 +63,7 @@ const fieldMap = core => {
       }),
 
       h(Button, {
-        onclick: () => actions.dialog(props.dialog(state, getValue(props), (btn, file) => {
-          if (btn === 'ok') {
-            actions.update({path: props.path, value: file});
-          }
-        }))
+        onclick: () => actions.dialog(props.dialog(props, state, actions, getValue(props)))
       }, '...')
     ]),
 
@@ -149,16 +145,20 @@ const sections = [{
     transformValue: value => value
       ? (typeof value === 'string' ? value : value.path)
       : value,
-    dialog: (state, value, callback) => ({
-      callback,
-      name: 'file',
-      args: {
+    dialog: (props, state, actions, currentValue) => ([
+      'file',
+      {
         //path: //TODO
         type: 'open',
         title: 'Select background',
         mime: [/^image/]
+      },
+      (btn, value) => {
+        if (btn === 'ok') {
+          actions.update({path: props.path, value});
+        }
       }
-    })
+    ])
   }, {
     label: 'Style',
     path: 'desktop.background.style',
@@ -172,7 +172,16 @@ const sections = [{
   }, {
     label: 'Color',
     path: 'desktop.background.color',
-    type: 'text'
+    type: 'dialog',
+    dialog: (props, state, actions, currentValue) => ([
+      'color',
+      {color: currentValue},
+      (btn, value) => {
+        if (btn === 'ok') {
+          actions.update({path: props.path, value: value.hex});
+        }
+      }
+    ])
   }]
 }, {
   title: 'Themes',
@@ -218,7 +227,6 @@ const renderWindow = (core, proc) => ($content, win) => {
   const packageService = core.make('osjs/packages');
   const desktopService = core.make('osjs/desktop');
   const {translate, translatableFlat} = core.make('osjs/locale');
-  const createDialog = (...args) => core.make('osjs/dialog', ...args);
   const components = createComponents(core);
 
   const getThemes = () => {
@@ -257,6 +265,8 @@ const renderWindow = (core, proc) => ($content, win) => {
     .set('osjs/desktop', null, settings.desktop)
     .set('osjs/locale', null, settings.locale)
     .save();
+
+  const createDialog = (...args) => core.make('osjs/dialog', ...args);
 
   const view = (state, actions) => h(Box, {}, [
     h(BoxContainer, {
@@ -306,10 +316,12 @@ const renderWindow = (core, proc) => ($content, win) => {
     },
 
     dialog: options => () => {
-      createDialog(options.name, options.args, {
+      const [name, args, callback] = options;
+
+      createDialog(name, args, {
         attributes: {modal: true},
         parent: win
-      }, options.callback);
+      }, callback);
     },
 
     update: ({path, value}) => state => resolveNewSetting(state)(path, value),
