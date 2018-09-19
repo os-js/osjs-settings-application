@@ -1,0 +1,17 @@
+{
+  "type": "application",
+  "name": "Settings",
+  "category": "utilities",
+  "singleton": true,
+  "server": null,
+  "title": {
+    "en_EN": "Settings"
+  },
+  "description": {
+    "en_EN": "Settings"
+  },
+  "files": [
+    "main.js",
+    "main.css"
+  ]
+}
