@@ -165,9 +165,9 @@ const createSections = core => [{
     type: 'select',
     choices: () => ({
       color: 'Color',
-      cover: 'Cover background size',
-      contain: 'Contain background size',
-      auto: 'Automatic background size'
+      cover: 'Cover',
+      contain: 'Contain',
+      repeat: 'Repeat'
     })
   }, {
     label: 'Color',
