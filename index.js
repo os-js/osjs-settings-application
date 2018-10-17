@@ -195,6 +195,11 @@ const createSections = core => [{
     path: 'desktop.icons',
     type: 'select',
     choices: state => state.themes.icons
+  }, {
+    label: 'Sounds',
+    path: 'desktop.sounds',
+    type: 'select',
+    choices: state => state.themes.sounds
   }]
 }, {
   title: 'Locales',
@@ -244,7 +249,9 @@ const renderWindow = (core, proc) => ($content, win) => {
     return {
       styles: get('theme'),
       icons: get('icons'),
-      sounds: get('sounds')
+      sounds: Object.assign({
+        '': 'None'
+      }, get('sounds'))
     };
   };
 
@@ -363,5 +370,4 @@ const register = (core, args, options, metadata) => {
 };
 
 // Register package in OS.js
-OSjs.make('osjs/packages')
-  .register(applicationName, register);
+OSjs.register(applicationName, register);
