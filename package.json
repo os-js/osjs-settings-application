@@ -1,6 +1,6 @@
 {
   "name": "@osjs/settings-application",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "OS.js v3 Settings Application",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -8,7 +8,7 @@
     "build": "webpack",
     "watch": "webpack --watch",
     "stylelint": "stylelint index.scss src/**/*.scss",
-    "prepublishOnly": "npm run eslint && npm run stylelint && rm ./dist/* && npm run build"
+    "prepublishOnly": "npm run eslint && npm run stylelint && rm ./dist/* && NODE_ENV=production npm run build"
   },
   "repository": {
     "type": "git",
