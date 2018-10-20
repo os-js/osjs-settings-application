@@ -5,10 +5,12 @@
   "singleton": true,
   "server": null,
   "title": {
-    "en_EN": "Settings"
+    "en_EN": "Settings",
+    "fr_FR": "Paramètres"
   },
   "description": {
-    "en_EN": "Settings"
+    "en_EN": "Settings",
+    "fr_FR": "Paramètres"
   },
   "files": [
     "main.js",
