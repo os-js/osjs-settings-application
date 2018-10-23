@@ -6,10 +6,12 @@
   "server": null,
   "title": {
     "en_EN": "Settings",
+    "nb_NO": "Instillinger",
     "fr_FR": "Paramètres"
   },
   "description": {
-    "en_EN": "Settings",
+    "en_EN": "Application to configure OS.js",
+    "nb_NO": "Applikasjon for å konfigurere OS.js",
     "fr_FR": "Paramètres"
   },
   "files": [
