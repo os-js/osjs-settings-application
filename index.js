@@ -39,7 +39,7 @@ import {
   Toolbar,
   TextField,
   SelectField
-} from '@osjs/gui/index.js';
+} from '@osjs/gui';
 
 // Maps our section items to a field
 const fieldMap = core => {
