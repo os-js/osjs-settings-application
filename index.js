@@ -28,7 +28,6 @@
  * @licence Simplified BSD License
  */
 
-import './index.scss';
 import merge from 'deepmerge';
 import {h, app} from 'hyperapp';
 import {name as applicationName} from './metadata.json';
