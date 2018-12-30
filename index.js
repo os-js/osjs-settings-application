@@ -37,11 +37,12 @@ import {
   Button,
   Toolbar,
   TextField,
-  SelectField
+  SelectField,
+  Tabs
 } from '@osjs/gui';
 
 // Maps our section items to a field
-const fieldMap = core => {
+const fieldMap = () => {
   const getValue = props => props.transformValue
     ? props.transformValue(props.value)
     : props.value;
@@ -53,7 +54,7 @@ const fieldMap = core => {
       oninput: (ev, value) => actions.update({path: props.path, value})
     }),
 
-    dialog: props => (state, actions) => h(BoxContainer, {padding: false}, [
+    dialog: props => (state, actions) => h(BoxContainer, {}, [
       h(TextField, {
         box: {grow: 1},
         readonly: true,
@@ -71,31 +72,6 @@ const fieldMap = core => {
       oninput: (ev, value) => actions.update({path: props.path, value})
     })
   };
-};
-
-// Custom GUI components
-const createComponents = core => {
-  const fields = fieldMap(core);
-
-  const Item = props => (state, actions) => {
-    const item = fields[props.type] || fields.fallback;
-
-    return h(BoxContainer, {shrink: 0, orientation: 'horizontal'}, [
-      h('div', {style: {lineHeight: 1.5}}, props.label),
-      item(props)(state, actions)
-    ]);
-  };
-
-  const Header = props => h('div', {style: {fontWeight: 'bold'}}, [
-    props.title
-  ]);
-
-  const Section = (props, children) => h(Box, {shrink: 0}, [
-    h(Header, {title: props.title}),
-    ...children
-  ]);
-
-  return {Item, Section};
 };
 
 // Resolves a tree by dot notation
@@ -135,7 +111,7 @@ const resolveNewSetting = state => (key, value) => {
 
 // Our sections
 // TODO: Translate
-const createSections = core => [{
+const tabSections = [{
   title: 'Background',
   items: [{
     label: 'Image',
@@ -203,7 +179,7 @@ const createSections = core => [{
 }, {
   title: 'Locales',
   items: [{
-    label: 'Language',
+    label: 'Language (requires restart)',
     path: 'locale.language',
     type: 'select',
     choices: state => state.locales
@@ -211,18 +187,33 @@ const createSections = core => [{
 }];
 
 // Renders sections
-const renderSections = (core, components, state, actions) => {
-  const sections = createSections(core);
+const renderSections = (core, state, actions) => {
   const resolver = resolveSetting(state.settings, state.defaults);
   const setting = path => resolver(path);
-  const {Section, Item} = components;
+  const fields = fieldMap();
 
-  return sections.map((section, index) => {
-    return h(Section, {title: section.title}, [
-      ...section.items.map(item => Item(Object.assign({
-        value: setting(item.path)
-      }, item)))
-    ]);
+  return tabSections.map(s => {
+    const items = s.items
+      .map(i => {
+        const item = props =>
+          (fields[props.type] || fields.fallback)(props)(state, actions);
+
+        return [
+          h(BoxContainer, {style: {marginBottom: 0}}, i.label),
+          h(item, Object.assign({
+            type: i.type,
+            value: setting(i.path)
+          }, i))
+        ];
+      });
+
+    return h(Box, {
+      grow: 1,
+      shrink: 1,
+      style: {
+        overflow: 'auto'
+      }
+    }, [].concat(...items));
   });
 };
 
@@ -232,25 +223,20 @@ const renderWindow = (core, proc) => ($content, win) => {
   const packageService = core.make('osjs/packages');
   const desktopService = core.make('osjs/desktop');
   const {translate, translatableFlat} = core.make('osjs/locale');
-  const components = createComponents(core);
+  const filter = type => pkg => pkg.type === type;
 
   const getThemes = () => {
-    const reduce = (result, pkg) => Object.assign({
-      [pkg.name]: translatableFlat(pkg.title)
-    }, result);
-
-    const filter = type => pkg => pkg.type === type;
-
     const get = type => packageService
       .getPackages(filter(type))
-      .reduce(reduce, {});
+      .map(pkg => ({value: pkg.name, label: translatableFlat(pkg.title)}));
 
     return {
       styles: get('theme'),
       icons: get('icons'),
-      sounds: Object.assign({
-        '': 'None'
-      }, get('sounds'))
+      sounds: [
+        {value: '', label: 'None'},
+        ...get('sounds')
+      ]
     };
   };
 
@@ -276,17 +262,16 @@ const renderWindow = (core, proc) => ($content, win) => {
   const createDialog = (...args) => core.make('osjs/dialog', ...args);
 
   const view = (state, actions) => h(Box, {}, [
-    h(BoxContainer, {
+    h(Tabs, {
       grow: 1,
       shrink: 1,
-      orientation: 'horizontal',
-      style: {overflow: 'auto'}
+      labels: tabSections.map(s => s.title)
     }, [
-      ...renderSections(core, components, state, actions)
+      ...renderSections(core, state, actions)
     ]),
 
     h(BoxContainer, {}, [
-      h(Toolbar, {justify: 'flex-end'}, [
+      h(Toolbar, {grow: 1, shrink: 1, justify: 'flex-end'}, [
         h(Button, {
           onclick: () => actions.save()
         }, translate('LBL_SAVE'))
@@ -332,7 +317,7 @@ const renderWindow = (core, proc) => ($content, win) => {
 
     update: ({path, value}) => state => resolveNewSetting(state)(path, value),
     refresh: () => () => ({settings: getSettings()}),
-    setLoading: loading => state => ({loading})
+    setLoading: loading => ({loading})
   };
 
   const instance = app(initialState, actions, view, $content);
