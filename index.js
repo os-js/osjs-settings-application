@@ -123,7 +123,7 @@ const tabSections = [{
     dialog: (props, state, actions, currentValue) => ([
       'file',
       {
-        //path: //TODO
+        // path: //TODO
         type: 'open',
         title: 'Select background',
         mime: [/^image/]
