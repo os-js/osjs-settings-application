@@ -29,6 +29,7 @@
  */
 
 import merge from 'deepmerge';
+import osjs from 'osjs';
 import {h, app} from 'hyperapp';
 import {name as applicationName} from './metadata.json';
 import {
@@ -354,4 +355,4 @@ const register = (core, args, options, metadata) => {
 };
 
 // Register package in OS.js
-OSjs.register(applicationName, register);
+osjs.register(applicationName, register);
