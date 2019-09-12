@@ -91,6 +91,10 @@ const resolve = (tree, key, defaultValue) => {
 const resolveSetting = (settings, defaults) => key =>
   resolve(settings, key, resolve(defaults, key));
 
+const resolveValue = (key, value) => key === 'desktop.iconview.enabled' // FIXME
+  ? value === 'true'
+  : value;
+
 // Resolves a new value in our tree
 // FIXME: There must be a better way
 const resolveNewSetting = state => (key, value) => {
@@ -99,11 +103,11 @@ const resolveNewSetting = state => (key, value) => {
 
   let previous = object;
   for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+    const j = keys[i];
     const last = i >= keys.length - 1;
 
-    previous[key] = last ? value : {};
-    previous = previous[key];
+    previous[j] = last ? resolveValue(key, value) : {};
+    previous = previous[j];
   }
 
   const settings = merge(state.settings, object);
@@ -176,6 +180,20 @@ const tabSections = [{
     path: 'desktop.sounds',
     type: 'select',
     choices: state => state.themes.sounds
+  }]
+}, {
+  title: 'Desktop',
+  items: [{
+    label: 'Enable desktop icons',
+    path: 'desktop.iconview.enabled',
+    type: 'select',
+    choices: () => ([{
+      label: 'Yes',
+      value: 'true'
+    }, {
+      label: 'No',
+      value: 'false'
+    }])
   }]
 }, {
   title: 'Locales',
@@ -325,8 +343,6 @@ const renderWindow = (core, proc) => ($content, win) => {
   const refresh = () => instance.refresh();
 
   win.on('settings/refresh', refresh);
-
-  console.warn(initialState);
 };
 
 // Creates our application
