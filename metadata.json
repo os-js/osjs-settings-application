@@ -7,12 +7,14 @@
   "title": {
     "en_EN": "Settings",
     "nb_NO": "Instillinger",
-    "fr_FR": "Paramètres"
+    "fr_FR": "Paramètres",
+    "pt_BR": "Configurações"
   },
   "description": {
     "en_EN": "Application to configure OS.js",
     "nb_NO": "Applikasjon for å konfigurere OS.js",
-    "fr_FR": "Paramètres"
+    "fr_FR": "Paramètres",
+    "pt_BR": "Aplicativo para configurar seu ambiente no OS.js"
   },
   "files": [
     "main.js"
