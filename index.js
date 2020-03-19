@@ -194,6 +194,29 @@ const tabSections = [{
       label: 'No',
       value: 'false'
     }])
+  }, {
+    label: 'Font color Style',
+    path: 'desktop.iconview.fontColorStyle',
+    type: 'select',
+    defaultValue: 'system',
+    choices: () => ({
+      system: 'System',
+      invert: 'Inverted background color',
+      custom: 'Custom color'
+    })
+  }, {
+    label: 'Custom font color',
+    path: 'desktop.iconview.fontColor',
+    type: 'dialog',
+    dialog: (props, state, actions, currentValue) => ([
+      'color',
+      {color: currentValue},
+      (btn, value) => {
+        if (btn === 'ok') {
+          actions.update({path: props.path, value: value.hex});
+        }
+      }
+    ])
   }]
 }, {
   title: 'Locales',
@@ -217,11 +240,16 @@ const renderSections = (core, state, actions) => {
         const item = props =>
           (fields[props.type] || fields.fallback)(props)(state, actions);
 
+        let value = setting(i.path);
+        if (typeof value === 'undefined') {
+          value = i.defaultValue;
+        }
+
         return [
           h(BoxContainer, {style: {marginBottom: 0}}, i.label),
           h(item, Object.assign({
             type: i.type,
-            value: setting(i.path)
+            value
           }, i))
         ];
       });
