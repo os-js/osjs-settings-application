@@ -195,7 +195,7 @@ const tabSections = [{
       value: 'false'
     }])
   }, {
-    label: 'Font color Style',
+    label: 'Font color style',
     path: 'desktop.iconview.fontColorStyle',
     type: 'select',
     defaultValue: 'system',
